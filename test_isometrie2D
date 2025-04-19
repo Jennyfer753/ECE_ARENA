@@ -1,0 +1,37 @@
+void arene(BITMAP* b) {
+    int largeur = 10;
+    int longueur = 10;
+    int largeur_case = 64;
+    int longeur_case= 32;
+    int Ox = 400;
+    int Oy = 100;
+
+
+    int coord_grille_x;
+    int coord_grille_y;
+    int coord_ecran_x;
+    int coord_ecran_y;
+
+    for (coord_grille_y = 0; coord_grille_y < longueur; coord_grille_y++) {
+        for ( coord_grille_x = 0;  coord_grille_x < largeur;  coord_grille_x++) {
+            coord_ecran_x = Ox + ( coord_grille_x - coord_grille_y) * largeur_case / 2;
+            coord_ecran_y = Oy + ( coord_grille_x + coord_grille_y) * longeur_case / 2;
+
+            int pointhaut_x = coord_ecran_x;
+            int pointhaut_y = coord_ecran_y;
+            int pointgauche_x = coord_ecran_x - largeur_case / 2;
+            int pointgauche_y = coord_ecran_y + longeur_case / 2;
+            int pointdroit_x = coord_ecran_x + largeur_case / 2;
+            int pointdroit_y = coord_ecran_y + longeur_case / 2;
+            int pointbas_x = coord_ecran_x;
+            int pointbas_y = coord_ecran_y + longeur_case;
+            int  sommet[8] = {pointhaut_x, pointhaut_y , pointgauche_x, pointgauche_y, pointbas_x, pointbas_y, pointdroit_x ,  pointdroit_y};
+            polygon(b, 4, sommet, makecol(0, 0, 0));
+
+            line(b, pointhaut_x, pointhaut_y , pointgauche_x, pointgauche_y,  makecol(255, 255, 255));
+            line(b, pointgauche_x, pointgauche_y, pointbas_x, pointbas_y,  makecol(255, 255, 255));
+            line(b, pointbas_x, pointbas_y, pointdroit_x ,  pointdroit_y,  makecol(255, 255, 255));
+            line(b, pointdroit_x ,  pointdroit_y, pointhaut_x, pointhaut_y ,  makecol(255, 255, 255));
+        }
+    }
+}
