@@ -6,3 +6,10 @@
 #define ATTAQUE_SORT_H
 
 #endif //ATTAQUE_SORT_H
+
+typedef struct Sort{
+    int PV;
+    int PA;
+};
+
+
