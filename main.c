@@ -2,9 +2,7 @@
 #include <allegro.h>
 #include "allegro_init.h"
 #include "menu.h"
-#include "1v1.h"
-#include "1v1v1.h"
-#include "1v1v1v1.h"
+#include "parties.h"
 
 int main() {
 
@@ -46,6 +44,22 @@ int main() {
             }
             else if (key[KEY_4]) {
                 etat_jeu = 4;
+            }
+
+            if (mouse_b & 1) {
+                int mx = mouse_x;
+                int my = mouse_y;
+                int rayon = 20;
+
+                if ((mx - 350)*(mx - 350) + (my - 300)*(my - 300) <= rayon*rayon) {
+                    etat_jeu = 2;
+                }
+                else if ((mx - 400)*(mx - 400) + (my - 300)*(my - 300) <= rayon*rayon) {
+                    etat_jeu = 3;
+                }
+                else if ((mx - 450)*(mx - 450) + (my - 300)*(my - 300) <= rayon*rayon) {
+                    etat_jeu = 4;
+                }
             }
             break;
 
