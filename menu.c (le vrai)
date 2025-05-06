@@ -1,0 +1,26 @@
+#include <stdio.h>
+#include <allegro.h>
+#include "menu.h"
+
+
+void ecran_menu(BITMAP* buffer) {
+    int x1=300;
+    int x2=500;
+    int y1=250;
+    int y2=350;
+    clear_bitmap(buffer);
+    rectfill(buffer,x1,y1,x2,y2,makecol(255, 0, 0));
+}
+
+void config_partie(BITMAP* buffer) {
+
+    textout_ex(buffer, font, "Nombre de joueurs ?", 800/3+60, 300 - 70, makecol(255, 255, 255), -1);
+
+    circlefill(buffer, 350, 300, 20, makecol(255, 0, 0));
+    textout_centre_ex(buffer, font, "2", 350, 300 - 4, makecol(255, 255, 255), -1);
+
+    circlefill(buffer, 400, 300, 20, makecol(0, 255, 0));
+    textout_centre_ex(buffer, font, "3", 400, 300 - 4, makecol(255, 255, 255), -1);
+
+    circlefill(buffer, 450, 300, 20, makecol(0, 0, 255));
+    textout_centre_ex(buffer, font, "4", 450, 300 - 4, makecol(255, 255, 255), -1);
