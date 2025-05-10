@@ -1,0 +1,97 @@
+#include <allegro.h>
+#include <stdio.h>
+#include "deplacement.h"
+#include "parties.h"
+#include "joueurs.h"
+# include "tours.h"
+
+void init_1v1(BITMAP* buffer) {
+    init_joueurs joueur[2] = {
+        {1, 5, makecol(255, 0, 0), 100, 10, 25, "undef", "J1"},
+        {10, 5, makecol(0, 255, 0), 100, 10, 25, "undef", "J2"}
+    };
+
+    t_file file;
+    initialiser_file_tours(&file, joueur, 2);
+
+    // Variable pour suivre le tour actuel
+    static int tour_en_cours = 0;
+    static init_joueurs* joueur_actuel = NULL;
+
+    // Premier tour
+    if (joueur_actuel == NULL) {
+        joueur_actuel = defiler(&file);
+        tour_en_cours += 1;
+    }
+
+    while (!key[KEY_ESC]) {
+        clear_bitmap(buffer);
+        // Si le tour est terminé, passer au joueur suivant
+        if (!tour_en_cours) {
+            enfiler(&file, joueur_actuel);
+            joueur_actuel = defiler(&file);
+            tour_en_cours += 1;
+            // ajouter ici les PM
+        }
+
+        // Gestion du déplacement seulement pour le joueur actuel
+        int index_actuel = joueur_actuel - joueur;
+
+        if (deplacement(buffer, joueur, 2, index_actuel, 0)) {
+            enfiler(&file, joueur_actuel);
+            joueur_actuel = defiler(&file);
+            index_actuel = joueur_actuel - joueur;
+
+            // Réinitialiser pour le prochain tour
+            deplacement(buffer, joueur, 2, index_actuel, 1);
+        }
+
+        /* Vérifier si le tour est terminé (par exemple quand PM == 0)
+        if (joueur_actuel->pm <= 0) {
+            tour_en_cours = 0;
+         }
+        */
+        // Affichage
+        for (int i = 0; i < 2; i++) {
+            int x = 110 + joueur[i].colonne * 50 + 50 / 2;
+            int y = joueur[i].ligne * 50 + 50 / 2;
+            circlefill(buffer, x, y, 20, joueur[i].couleur);
+            if (i == index_actuel) {
+                circle(buffer, x, y, 25, makecol(0, 255, 0));
+            }
+        }
+
+        blit(buffer, screen, 0, 0, 0, 0, 800, 600);
+    }
+}
+
+/*
+void init_1v1v1(BITMAP* buffer) {
+    init_joueurs joueur[3] ={
+        {1, 5, makecol(255, 0, 0), 100, 25,10,"undef","J1"},
+        {10, 5, makecol(0, 255, 0),100, 10,25,"undef","J2"},
+        { 5,1,makecol(0,0,255), 100, 10,25,"undef","J3"}};
+
+    while (!key[KEY_ESC]) {
+        clear_bitmap(buffer);
+        deplacement(buffer, joueur, 3);
+        blit(buffer, screen, 0, 0, 0, 0, 800, 600);
+    }
+}
+
+
+void init_1v1v1v1(BITMAP* buffer) {
+    init_joueurs joueur[4] ={
+        {1, 5, makecol(255, 0, 0), 100, 10,25,"undef","J1"},
+        {10, 5, makecol(0, 255, 0), 100, 10,25,"undef","J2"},
+        { 5,1,makecol(0,0,255), 100, 10,25,"undef","J3"},
+        {5,10,makecol(255,255,255), 100, 10,25,"undef","J4"}};
+
+    while (!key[KEY_ESC]) {
+        clear_bitmap(buffer);
+        deplacement(buffer, joueur, 4);
+        blit(buffer, screen, 0, 0, 0, 0, 800, 600);
+    }
+
+}
+*/
