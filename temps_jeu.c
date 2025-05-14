@@ -4,37 +4,34 @@
 #include <time.h>
 #include "allegro_init.h"
 
-// Le code suivant a été pris d'un video youtube de la chaine "Remilulz_91 - Programmations" sur le chronometre
-// mais elle a apres été modifié pour que ça reponde aux attentes du projet
-
-void my_delay(int i) {
-    clock_t start = clock();
-    while (clock() - start < i * CLOCKS_PER_SEC);
-}
-
+// Affiche le chrono et retourne 1 quand 15 secondes sont écoulées
 int temps(BITMAP* buffer) {
-    static int timerseconde1 = 0, timerseconde2 = 0;
+    static clock_t start_time = 0;
+    static int secondes = 0;
     char temps_str[10];
-    // Incrémentation des secondes
-    if (timerseconde2 == 9) {
-        timerseconde1++;
-        timerseconde2 = -1;
-    }
-    timerseconde2++;
 
-    // Affichage graphique
+    if (start_time == 0) {
+        start_time = clock();  // Initialisation au premier appel
+    }
+
+    // Met à jour les secondes si une nouvelle seconde s'est écoulée
+    clock_t elapsed = (clock() - start_time) / CLOCKS_PER_SEC;
+    if (elapsed > secondes) {
+        secondes = elapsed;
+    }
+
+    // Affichage graphique du compteur de secondes
     rectfill(buffer, 740, 25, 775, 40, makecol(255, 0, 0));
-    sprintf(temps_str, "%d%d", timerseconde1, timerseconde2);
+    sprintf(temps_str, "%02d", secondes);
     textout_ex(buffer, font, temps_str, 750, 30, makecol(255, 255, 255), -1);
 
-    my_delay(1); // Attend 1 seconde
-
-    // Si 15 secondes écoulées, retourne 1
-    if (timerseconde1 == 1 && timerseconde2 == 5) {
-        timerseconde1 = 0;
-        timerseconde2 = 0;
+    // Si 15 secondes écoulées, réinitialiser et retourner 1
+    if (secondes >= 15) {
+        secondes = 0;
+        start_time = clock(); // Redémarrer le timer
         return 1;
     }
 
     return 0;
 }
+
