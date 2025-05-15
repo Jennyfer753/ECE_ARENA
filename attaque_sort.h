@@ -8,13 +8,26 @@
 #include <allegro.h>
 
 // Définition de la structure Sort
-typedef struct Sort {
+typedef struct {
     int pv_retire;
-    int cout_pa;
+    int pa_requis;
     char nom[30];
     int portee_min;
     int portee_max;
+    int chance_echec;
 } Sort;
+
+typedef struct {
+    BITMAP* sort_bmp;
+    char nom[50];
+}Sprite;
+
+typedef struct {
+    Sort* sort;
+    char nom[50];
+}JoueurLanceur;
+
+/*** SORTS POUR CHAQUE PERSONNAGE ***/
 
 // Prototypes des sorts du Mage
 void sort_pluie_de_glace(Sort* sort);
