@@ -1,0 +1,74 @@
+#include <allegro.h>
+#include <stdlib.h>
+
+void initialisation_allegro();
+
+int main() {
+    BITMAP *buffer;
+    char page_actuelle = 0;  // 0 = menu principal, 'A' à 'D' = page active
+
+    initialisation_allegro();
+    buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    if (!buffer) {
+        allegro_message("Erreur création du buffer");
+        return 1;
+    }
+
+    show_mouse(screen);  // Affiche la souris
+
+    while (!key[KEY_ESC] || page_actuelle != 0) {
+        clear_bitmap(buffer);
+
+        if (page_actuelle != 0) {
+            // Affiche la page avec la lettre correspondante
+            char texte[2] = { page_actuelle, '\0' };
+            textout_centre_ex(buffer, font, texte, SCREEN_W / 2, SCREEN_H / 2, makecol(255, 255, 255), -1);
+
+            if (key[KEY_ESC]) {
+                page_actuelle = 0; // Retour au menu principal
+                rest(150); // Anti-rebond clavier
+            }
+        } else {
+            // Affiche les 4 rectangles rouges
+            rectfill(buffer, 50, 50, 390, 290, makecol(255, 0, 0));
+            rectfill(buffer, 410, 310, 750, 550, makecol(255, 0, 0));
+            rectfill(buffer, 50, 310, 390, 550, makecol(255, 0, 0));
+            rectfill(buffer, 410, 50, 750, 290, makecol(255, 0, 0));
+
+            if (mouse_b & 1) { // Si clic gauche
+                if (mouse_x >= 50 && mouse_x <= 390 && mouse_y >= 50 && mouse_y <= 290)
+                    page_actuelle = 'A';
+                else if (mouse_x >= 410 && mouse_x <= 750 && mouse_y >= 310 && mouse_y <= 550)
+                    page_actuelle = 'D';
+                else if (mouse_x >= 50 && mouse_x <= 390 && mouse_y >= 310 && mouse_y <= 550)
+                    page_actuelle = 'B';
+                else if (mouse_x >= 410 && mouse_x <= 750 && mouse_y >= 50 && mouse_y <= 290)
+                    page_actuelle = 'C';
+
+                rest(150); // Anti-rebond du clic
+            }
+        }
+
+        blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+        rest(16); // Petite pause pour limiter l'utilisation CPU
+    }
+
+    destroy_bitmap(buffer);
+    allegro_exit();
+    return 0;
+}
+END_OF_MAIN()
+
+void initialisation_allegro() {
+    allegro_init();
+    install_keyboard();
+    install_mouse();
+    set_color_depth(desktop_color_depth());
+
+    if (set_gfx_mode(GFX_AUTODETECT_WINDOWED, 800, 600, 0, 0) != 0) {
+        allegro_message("Problème mode graphique");
+        allegro_exit();
+        exit(EXIT_FAILURE);
+    }
+}
+
