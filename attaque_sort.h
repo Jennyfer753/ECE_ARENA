@@ -1,7 +1,4 @@
-//
-// Created by Admin on 20/04/2025.
-//
-
+// attaque_sort.h
 #ifndef ATTAQUE_SORT_H
 #define ATTAQUE_SORT_H
 
@@ -9,48 +6,41 @@
 
 // Définition de la structure Sort
 typedef struct {
-    int pv_retire;
+    int pv_retire_min;
+    int pv_retire_max;
     int pa_requis;
     char nom[30];
     int portee_min;
     int portee_max;
     int chance_echec;
+    int zone_effet; // 0 = cible unique, 1 = cases adjacentes, etc.
+    BITMAP* animation[10]; // Tableau pour les frames d'animation
+    int nb_frames;
+    int frame_delay; // Délai entre chaque frame
 } Sort;
 
 typedef struct {
-    BITMAP* sort_bmp;
-    char nom[50];
-}Sprite;
+    Sort sorts[4]; // Chaque personnage a 4 sorts
+    char nom_classe[50];
+    BITMAP* sprite;
+} ClassePersonnage;
 
-typedef struct {
-    Sort* sort;
-    char nom[50];
-}JoueurLanceur;
+// Prototypes des fonctions
+void initialiser_sort(Sort* sort, const char* nom, int pv_min, int pv_max, int pa, 
+                     int portee_min, int portee_max, int echec, int zone);
+void charger_animations_sort(Sort* sort, const char* prefixe_nom_fichier);
+void liberer_sort(Sort* sort);
 
-/*** SORTS POUR CHAQUE PERSONNAGE ***/
+// Fonctions pour initialiser les sorts de chaque classe
+void initialiser_sorts_mage(ClassePersonnage* classe);
+void initialiser_sorts_maitresse_dragon(ClassePersonnage* classe);
+void initialiser_sorts_savant_fou(ClassePersonnage* classe);
+void initialiser_sorts_archere(ClassePersonnage* classe);
 
-// Prototypes des sorts du Mage
-void sort_pluie_de_glace(Sort* sort);
-void sort_sac_de_feu(Sort* sort);
-void sort_tornade(Sort* sort);
-void sort_cercueil_de_boue(Sort* sort);
+// Fonctions pour lancer les sorts
+int lancer_sort(Sort* sort, int x_source, int y_source, int x_cible, int y_cible, 
+               BITMAP* buffer, int* frame_counter);
+void afficher_portee_sort(Sort* sort, int x_source, int y_source, 
+                         int** grille, int largeur, int hauteur, BITMAP* buffer);
 
-// Prototypes des sorts de la Maîtresse Dragon
-void sort_boule_de_feu(Sort* sort);
-void sort_multi_boule_de_feu(Sort* sort);
-void sort_bebe_dragon_feu(Sort* sort);
-void sort_susano_dragon(Sort* sort);
-
-// Prototypes des sorts du Savant Fou
-void sort_bombe(Sort* sort);
-void sort_canon(Sort* sort);
-void sort_mitraillette(Sort* sort);
-void sort_super_bazooka(Sort* sort);
-
-// Prototypes des sorts de l’Archère
-void sort_tir_normal(Sort* sort);
-void sort_tir_multiple(Sort* sort);
-void sort_fleche_poison(Sort* sort);
-void sort_fleche_foudre(Sort* sort);
-
-#endif //ATTAQUE_SORT_H
+#endif // ATTAQUE_SORT_H
