@@ -165,7 +165,7 @@ void afficher_portee_sort(Sort* sort, int x_source, int y_source,
                          int** grille, int largeur, int hauteur, BITMAP* buffer) {
     for (int y = 0; y < hauteur; y++) {
         for (int x = 0; x < largeur; x++) {
-            // Calculer la distance de Manhattan
+          
             int distance = abs(x - x_source) + abs(y - y_source);
 
             // Vérifier si la case est à portée et accessible
