@@ -2,12 +2,12 @@
 // Created by abiec on 14/05/2025.
 //
 #include <stdio.h>
-#include "attaque_corps.h"
 #include "attaque_sort.h"
+#include "joueurs.h"
 
 void afficherNuageFumee(ClassePersonnage* a, ClassePersonnage* b) ;
 
-/**On teste que les personnages soient bien sur des cases voisines**/ 
+/**On teste que les personnages soient bien sur des cases voisines**/
 int sontAdjacents(ClassePersonnage *a, ClassePersonnage *b) {
     if (abs(a->x - b->x) + abs(a->y - b->y) == 1) {//on vérifie qu'ils sont sur des cases voisines
         return 1;
@@ -36,6 +36,6 @@ void attaqueCAC(ClassePersonnage *attaquant, ClassePersonnage *cible) {
         attaquant->x = oldX;
         attaquant->y = oldY;
     } else {
-        printf("Pas à portée !"); // Afficher à l'écran qu'on ne peut pas faire d'attaque au corps à corps 
+        printf("Pas à portée !"); // Afficher à l'écran qu'on ne peut pas faire d'attaque au corps à corps
     }
 }
