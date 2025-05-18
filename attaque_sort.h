@@ -24,8 +24,10 @@ typedef struct {
     Sort sorts[4]; // Chaque personnage a 4 sorts
     char nom_classe[50];
     BITMAP* sprite; // Sprite pour les animations de personnages
-    int x; //Numéro de la ligne la ligne
+    int x; //Numéro de la ligne
     int y; // Numéro de la colonne
+    int puissanceCAC; //Puissance pour les attaques au corps à corps
+    int pv;
 } ClassePersonnage;
 
 // Prototypes des fonctions
