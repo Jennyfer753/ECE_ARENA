@@ -5,7 +5,7 @@
 #include "attaque_sort.h"
 #include "joueurs.h"
 
-void afficherNuageFumee(ClassePersonnage* a, ClassePersonnage* b) ;
+
 
 /**On teste que les personnages soient bien sur des cases voisines**/
 int sontAdjacents(ClassePersonnage *a, ClassePersonnage *b) {
@@ -25,9 +25,7 @@ void attaqueCAC(ClassePersonnage *attaquant, ClassePersonnage *cible) {
 
         attaquant->x = cible->x;
         attaquant->y = cible->y;
-
-        // Pas encore codé mais il faut coder ça pour avoir un nuage de fumée lorsqu'il y a collision entre les personnages
-        afficherNuageDeFumee(cible->x, cible->y); //Celui qui attaque fonce sur la cible et il y a un nuage de fumée pour marquer l'attaque
+        
 
         // On applique les dégâts sur les pv de la cible
         cible->pv -= attaquant->puissanceCAC;
