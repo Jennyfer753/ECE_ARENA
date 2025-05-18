@@ -1,0 +1,26 @@
+
+#ifndef CLASSEMENT_H
+#define CLASSEMENT_H
+
+#include "parties.h"
+#include <allegro.h>
+#include <stdlib.h>
+#include "pile.h"
+#include "allegro_init.h"
+#include "menu.h"
+
+// definition d'une constante
+#define MAX_PILE 10
+
+/* fonction qui permet d'afficher le classmeent ainsi que la page qui va avec
+ */
+int classement();
+
+
+//structure qui sert qui sert comme pile pour mettre les personne quand elle meurt et après les mettre dans le classement
+typedef struct {
+    init_joueurs* elements[MAX_PILE];
+    int sommet;
+} Pile_classement;
+
+#endif //CLASSEMENT_H
