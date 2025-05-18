@@ -10,7 +10,8 @@
 // Initialisation d'un sort avec ses caractéristiques de base
 void initialiser_sort(Sort* sort, const char* nom, int pv_min, int pv_max, int pa, int portee_min, int portee_max, int echec, int zone) {
     strcpy(sort->nom, nom);
-    sort->pv_retire_min = pv_min;
+    /**On donne les valeurs choisies à tous les paramètres**/
+    sort->pv_retire_min = pv_min; 
     sort->pv_retire_max = pv_max;
     sort->pa_requis = pa;
     sort->portee_min = portee_min;
@@ -26,7 +27,7 @@ void charger_animations_sort(Sort* sort, const char* prefixe_nom_fichier) {
     char filename[100];
     int i = 0;
 
-    while (i < 10) { // Limité à 10 frames max
+    while (i < 10) { // Limité à 10 frames max par sort
         sprintf(filename, "%s%d.bmp", prefixe_nom_fichier, i);
         sort->animation[i] = load_bitmap(filename, NULL);
         if (!sort->animation[i]) break; // Arrêt si fichier introuvable
@@ -94,7 +95,7 @@ void initialiser_sorts_archere(ClassePersonnage* classe) {
     charger_animations_sort(&classe->sorts[3], "archere_fleche_foudroyante_");
 }
 
-//Initialisation des sorts du Savant fou 
+//Initialisation des sorts du Savant fou
 void initialiser_sorts_savant_fou(ClassePersonnage* classe) {
     // Sort 1: Bombe
     initialiser_sort(&classe->sorts[0], "Bombe", 10, 15, 3, 2, 5, 10, 1);
@@ -134,7 +135,7 @@ void afficher_portee_sort(Sort* sort, int x_source, int y_source, int** grille, 
     }
 }
 
-// Fonction pour lancer de sort avec animation et calcul des dégâts infligés 
+// Fonction pour lancer de sort avec animation et calcul des dégâts infligés
 int lancer_sort(Sort* sort, int x_cible, int y_cible, BITMAP* buffer) {
     static int frame_actuelle = 0;
     static int delay_counter = 0;
@@ -160,4 +161,3 @@ int lancer_sort(Sort* sort, int x_cible, int y_cible, BITMAP* buffer) {
         return sort->pv_retire_min + rand() % (sort->pv_retire_max - sort->pv_retire_min + 1);
     }
 }
-
