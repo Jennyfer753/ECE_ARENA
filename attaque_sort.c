@@ -2,10 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
+#include <allegro.h>
 
-// Initialise un sort avec ses paramètres de base
-void initialiser_sort(Sort* sort, const char* nom, int pv_min, int pv_max, int pa,
-                     int portee_min, int portee_max, int echec, int zone) {
+#define TAILLE_CASE 50
+
+// Initialisation d'un sort avec ses caractéristiques de base
+void initialiser_sort(Sort* sort, const char* nom, int pv_min, int pv_max, int pa, int portee_min, int portee_max, int echec, int zone) {
     strcpy(sort->nom, nom);
     sort->pv_retire_min = pv_min;
     sort->pv_retire_max = pv_max;
@@ -15,40 +18,25 @@ void initialiser_sort(Sort* sort, const char* nom, int pv_min, int pv_max, int p
     sort->chance_echec = echec;
     sort->zone_effet = zone;
     sort->nb_frames = 0;
-    sort->frame_delay = 5; // Valeur exemple
+    sort->frame_delay = 5;
 }
 
-// Charge les animations d'un sort à partir de fichiers BMP
+// On charge les frames d'animation d'un sort
 void charger_animations_sort(Sort* sort, const char* prefixe_nom_fichier) {
     char filename[100];
     int i = 0;
 
-    while (i < 10) { // Il y a un max de 10 frames pour les animations
+    while (i < 10) { // Limité à 10 frames max
         sprintf(filename, "%s%d.bmp", prefixe_nom_fichier, i);
         sort->animation[i] = load_bitmap(filename, NULL);
-
-        if (!sort->animation[i]) {
-            break; // Plus de fichiers disponibles
-        }
-
-        // Pour la transparence
-        set_color_conversion(COLORCONV_KEEP_TRANS);
-        set_alpha_blender();
-
+        if (!sort->animation[i]) break; // Arrêt si fichier introuvable
         i++;
     }
 
     sort->nb_frames = i;
 }
 
-// Libère la mémoire des animations d'un sort
-void liberer_sort(Sort* sort) {
-    for (int i = 0; i < sort->nb_frames; i++) {
-        if (sort->animation[i]) {
-            destroy_bitmap(sort->animation[i]);
-        }
-    }
-}
+/**INITIALISATION DES SORTS DES PERSONNAGES**/
 
 // Initialisation des sorts du Mage
 void initialiser_sorts_mage(ClassePersonnage* classe) {
@@ -68,6 +56,7 @@ void initialiser_sorts_mage(ClassePersonnage* classe) {
 
 }
 
+//Initialisation des sorts de la Maitresse dragon
 void initialiser_sorts_maitresse(ClassePersonnage* classe) {
     // Sort 1 : Bébé dragon
     initialiser_sort(&classe->sorts[0], "Bébé dragon", 12, 15, 3, 2, 5, 10, 1);
@@ -86,6 +75,7 @@ void initialiser_sorts_maitresse(ClassePersonnage* classe) {
     charger_animations_sort(&classe->sorts[3], "maitresse_unique_boule_");
 }
 
+//Initialisation des sorts de l'Archère
 void initialiser_sorts_archere(ClassePersonnage* classe) {
     // Sort 1 : Tir unique
     initialiser_sort(&classe->sorts[0], "Tir unique", 10, 15, 3, 2, 5, 10, 1);
@@ -104,6 +94,7 @@ void initialiser_sorts_archere(ClassePersonnage* classe) {
     charger_animations_sort(&classe->sorts[3], "archere_fleche_foudroyante_");
 }
 
+//Initialisation des sorts du Savant fou 
 void initialiser_sorts_savant_fou(ClassePersonnage* classe) {
     // Sort 1: Bombe
     initialiser_sort(&classe->sorts[0], "Bombe", 10, 15, 3, 2, 5, 10, 1);
@@ -122,59 +113,50 @@ void initialiser_sorts_savant_fou(ClassePersonnage* classe) {
     charger_animations_sort(&classe->sorts[3], "savant_fou_bazooka_");
 }
 
+// Libère les bitmaps des animations d'un sort
+void liberer_sort(Sort* sort) {
+    for (int i = 0; i < sort->nb_frames; i++) {
+        if (sort->animation[i]) {
+            destroy_bitmap(sort->animation[i]);
+        }
+    }
+}
 
-// Lance un sort et affiche son animation
-int lancer_sort(Sort* sort, int x_source, int y_source, int x_cible, int y_cible,
-               BITMAP* buffer, int* frame_counter) {
-     int frame_actuelle = 0;
-     int delay_counter = 0;
+// Affiche la portée du sort sur la grille (cases vertes)
+void afficher_portee_sort(Sort* sort, int x_source, int y_source, int** grille, int largeur, int hauteur, BITMAP* buffer) {
+    for (int y = 0; y < hauteur; y++) {
+        for (int x = 0; x < largeur; x++) {
+            int distance = abs(x - x_source) + abs(y - y_source);
+            if (distance >= sort->portee_min && distance <= sort->portee_max && grille[y][x] == 1) {
+                rectfill(buffer, x * TAILLE_CASE, y * TAILLE_CASE, (x + 1) * TAILLE_CASE, (y + 1) * TAILLE_CASE, makecol(0, 255, 0));
+            }
+        }
+    }
+}
 
-    // Afficher l'animation
+// Fonction pour lancer de sort avec animation et calcul des dégâts infligés 
+int lancer_sort(Sort* sort, int x_cible, int y_cible, BITMAP* buffer) {
+    static int frame_actuelle = 0;
+    static int delay_counter = 0;
+
     if (frame_actuelle < sort->nb_frames) {
-        // Calculer la position pour centrer l'animation sur la cible
-        int anim_x = x_cible * TAILLE_CASE + (TAILLE_CASE - sort->animation[frame_actuelle]->w) / 2;
-        int anim_y = y_cible * TAILLE_CASE + (TAILLE_CASE - sort->animation[frame_actuelle]->h) / 2;
-
-        // Dessiner avec transparence pour le magenta
-        draw_trans_sprite(buffer, sort->animation[frame_actuelle], anim_x, anim_y);
+        int anim_x = x_cible * TAILLE_CASE;
+        int anim_y = y_cible * TAILLE_CASE;
+        draw_sprite(buffer, sort->animation[frame_actuelle], anim_x, anim_y);
 
         delay_counter++;
         if (delay_counter >= sort->frame_delay) {
             delay_counter = 0;
             frame_actuelle++;
         }
-
         return 0; // Animation en cours
     } else {
-        // Animation terminée
         frame_actuelle = 0;
         delay_counter = 0;
-
-        // Calculer les dégâts
         srand(time(NULL));
         if (rand() % 100 < sort->chance_echec) {
-            return 0; // Sort a échoué
+            return 0; // Le sort a échoué.
         }
-
         return sort->pv_retire_min + rand() % (sort->pv_retire_max - sort->pv_retire_min + 1);
-    }
-}
-
-// Affiche les cases à portée du sort
-void afficher_portee_sort(Sort* sort, int x_source, int y_source,
-                         int** grille, int largeur, int hauteur, BITMAP* buffer) {
-    for (int y = 0; y < hauteur; y++) {
-        for (int x = 0; x < largeur; x++) {
-          
-            int distance = abs(x - x_source) + abs(y - y_source);
-
-            // Vérifier si la case est à portée et accessible
-            if (distance >= sort->portee_min && distance <= sort->portee_max && grille[y][x] == 1) {
-                // Dessiner un rectangle semi-transparent
-                rectfill(buffer, x * TAILLE_CASE, y * TAILLE_CASE,
-                        (x + 1) * TAILLE_CASE, (y + 1) * TAILLE_CASE,
-                        makecol(0, 255, 0)); // Vert pour les cases à portée
-            }
-        }
     }
 }
