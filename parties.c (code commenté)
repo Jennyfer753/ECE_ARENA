@@ -1,0 +1,294 @@
+
+#include "parties.h"
+
+void init_1v1(BITMAP* buffer) {
+    srand(time(NULL)); // on commence l'aléatoire
+    int nb_joueurs = 2; // On initialise le nombre de joueurs etant de deux
+
+    init_joueurs joueur[2] = {// On place les joueurs sur la grille
+        {1, 5, makecol(255, 0, 0), 100, 10, 25, "classe", "J1"},
+        {10, 5, makecol(0, 255, 0), 100, 10, 25, "classe", "J2"}
+    };
+
+    for (int g = 0; g < 2; g++) { // On demande a chaque joueur de faire le choix de la classe qu'il souhaite avoir
+        while (mouse_b & 1) rest(10);
+        choix_perso(buffer, &joueur[g], g);
+    }
+
+    //On initialise une file pour deux joueurs pour après mettre l'ordre des tours
+    t_file file;
+    initialiser_file_tours(&file, joueur, 2);
+
+    //On initialise également une pile Pour apres faire le classement des joueurs
+    Pile_classement pile_classement_joueurs;
+    init_pile(&pile_classement_joueurs);
+
+    static int tour_en_cours = 0;
+    static init_joueurs* joueur_actuel = NULL; // On commence par le premier joueur de la file
+
+    int joueurs_actifs[2] = {1, 1}; // On commence avec deux joueurs actifs
+
+    if (joueur_actuel == NULL) { // On lance le jeu, on commence par defiler pour savoir a qui est le tour.
+        joueur_actuel = defiler(&file);
+        tour_en_cours++;
+    }
+
+    reinit_temps(); // On recommence le temps
+
+    while (!key[KEY_ESC]) { // Tant que on appuie par sur la touche echap
+        clear_bitmap(buffer); // enleve tout ce qui aurait peu être sur la bitmap
+
+        int index_actuel = joueur_actuel - joueur; //sert à calculer la position du joueur_actuel
+
+        
+        // Si le joueur actuel n’a plus de PV on l'empile pour après faire le classemeent 
+        if (joueur_actuel->pv == 0 && joueurs_actifs[index_actuel]) {
+            empiler(&pile_classement_joueurs, joueur_actuel);
+            joueurs_actifs[index_actuel] = 0;
+            nb_joueurs--; // on enleve 1 au nombre de joueurs
+
+            // Si 1 seul joueur restant alors on empile puis on affiche le classement
+            if (nb_joueurs == 1) {
+                for (int i = 0; i < 2; i++) {
+                    if (joueurs_actifs[i]) {
+                        empiler(&pile_classement_joueurs, &joueur[i]);
+                        joueurs_actifs[i] = 0;
+                        break;
+                    }
+                }
+                classement(&pile_classement_joueurs);
+                return;
+            }
+            //On defile les joueurs puis on réinitialise le temps pour passer au joueur suivant
+            joueur_actuel = defiler(&file);
+            reinit_temps();
+            continue;
+        }
+
+        // Si temps écoulé alors on change de joueur
+        if (temps(buffer)) {
+            if (joueurs_actifs[index_actuel] && joueur_actuel->pm > 0) {
+                enfiler(&file, joueur_actuel);
+            }
+
+            joueur_actuel = defiler(&file);
+            reinit_temps();
+            tour_en_cours++;
+        }
+
+        // Actions du déplacement
+        deplacement(buffer, joueur, 2, index_actuel, 0);
+
+        // Affichage des joueurs actifs sur le plateau
+        for (int i = 0; i < 2; i++) {
+            if (!joueurs_actifs[i]) continue;
+            int taille_case = 40;
+            int decalage_x = 20;
+            int decalage_y = (600 - 13 * taille_case) / 2;
+
+            int x = decalage_x + joueur[i].colonne * taille_case + taille_case / 2;
+            int y = decalage_y + joueur[i].ligne * taille_case + taille_case / 2;
+
+            circlefill(buffer, x, y, 20, joueur[i].couleur);
+            if (i == index_actuel) {
+                circle(buffer, x, y, 25, makecol(0, 255, 0));
+            }
+        }
+
+        blit(buffer, screen, 0, 0, 0, 0, 800, 600);
+    }
+}
+
+
+
+void init_1v1v1(BITMAP* buffer) {
+    srand(time(NULL)); // on commence l'aléatoire
+    int nb_joueurs = 3; // On initialise le nombre de joueurs etant de trois
+
+    init_joueurs joueur[3] = { // On place les joueurs sur la grille
+        {1, 5, makecol(255, 0, 0), 100, 25, 10, "undef", "J1"},
+        {10, 5, makecol(0, 255, 0), 100, 10, 25, "undef", "J2"},
+        {5, 1, makecol(0, 0, 255), 100, 10, 25, "undef", "J3"}
+    };
+
+    for (int g = 0; g < 3; g++) { // On demande a chaque joueur de faire le choix de la classe qu'il souhaite avoir
+        while (mouse_b & 1) rest(10);
+        choix_perso(buffer, &joueur[g], g);
+    }
+
+    t_file file;
+    initialiser_file_tours(&file, joueur, 3);
+
+    Pile_classement pile_classement_joueurs;
+    init_pile(&pile_classement_joueurs);
+
+    static int tour_en_cours = 0;
+    static init_joueurs* joueur_actuel = NULL; // On commence par le premier joueur de la file
+
+    int joueurs_actifs[3] = {1, 1, 1}; // On commence avec trois joueurs actifs
+
+    if (joueur_actuel == NULL) {
+        joueur_actuel = defiler(&file);
+        tour_en_cours++;
+    }
+
+    reinit_temps();
+
+    while (!key[KEY_ESC]) {
+        clear_bitmap(buffer); // enleve tout ce qui aurait peu être sur la bitmap
+        
+        int index_actuel = joueur_actuel - joueur;
+
+        // Si le joueur actuel n’a plus de PM
+        if (joueur_actuel->pm == 0 && joueurs_actifs[index_actuel]) {
+            empiler(&pile_classement_joueurs, joueur_actuel);
+            joueurs_actifs[index_actuel] = 0;
+            nb_joueurs--;
+
+            // Si 1 seul joueur restant alors on empile puis on affiche le classement
+            if (nb_joueurs == 1) {
+                for (int i = 0; i < 3; i++) {
+                    if (joueurs_actifs[i]) {
+                        empiler(&pile_classement_joueurs, &joueur[i]);
+                        joueurs_actifs[i] = 0;
+                        break;
+                    }
+                }
+                classement(&pile_classement_joueurs);
+                return;
+            }
+            //On defile les joueurs puis on réinitialise le temps pour passer au joueur suivant
+            joueur_actuel = defiler(&file);
+            reinit_temps();
+            continue;
+        }
+
+        // Si temps écoulé alors on change de joueur
+        if (temps(buffer)) {
+            if (joueurs_actifs[index_actuel] && joueur_actuel->pm > 0) {
+                enfiler(&file, joueur_actuel);
+            }
+
+            joueur_actuel = defiler(&file);
+            reinit_temps();
+            tour_en_cours++;
+        }
+
+        // Actions pour le déplacement
+        deplacement(buffer, joueur, 3, index_actuel, 0);
+
+        // Affichage des joueurs actifs sur le plateau
+        for (int i = 0; i < 3; i++) {
+            if (!joueurs_actifs[i]) continue;
+            int taille_case = 40;
+            int decalage_x = 20;
+            int decalage_y = (600 - 13 * taille_case) / 2;
+
+            int x = decalage_x + joueur[i].colonne * taille_case + taille_case / 2;
+            int y = decalage_y + joueur[i].ligne * taille_case + taille_case / 2;
+
+            circlefill(buffer, x, y, 20, joueur[i].couleur);
+            if (i == index_actuel) {
+                circle(buffer, x, y, 25, makecol(0, 255, 0));
+            }
+        }
+
+        blit(buffer, screen, 0, 0, 0, 0, 800, 600);
+    }
+}
+
+
+
+void init_1v1v1v1(BITMAP* buffer) {
+    srand(time(NULL)); // on lance l'aléatoire
+    int nb_joueurs = 4; // On initialise le nombre de joueurs etant de quatre
+    init_joueurs joueur[4] = {
+        {1, 5, makecol(255, 0, 0), 100, 10, 25, "undef", "J1"},
+        {10, 5, makecol(0, 255, 0), 100, 10, 25, "undef", "J2"},
+        {5, 1, makecol(0, 0, 255), 100, 10, 25, "undef", "J3"},
+        {5, 10, makecol(255, 255, 255), 100, 10, 25, "undef", "J4"}
+    };
+    for (int g = 0; g < 4; g++) {
+        while (mouse_b & 1) rest(10);
+        choix_perso(buffer, &joueur[g], g);
+    }
+
+    t_file file;
+    initialiser_file_tours(&file, joueur, 4);
+
+    Pile_classement pile_classement_joueurs;
+    init_pile(&pile_classement_joueurs);
+
+    static int tour_en_cours = 0;
+    static init_joueurs* joueur_actuel = NULL; // On commence par le premier joueur de la file
+
+    int joueurs_actifs[4] = {1, 1, 1, 1}; // On commence avec quatres joueurs actifs
+
+    if (joueur_actuel == NULL) {
+        joueur_actuel = defiler(&file);
+        tour_en_cours++;
+    }
+
+    reinit_temps();
+
+    while (!key[KEY_ESC]) {
+        clear_bitmap(buffer); // enleve tout ce qui aurait peu être sur la bitmap
+        
+        int index_actuel = joueur_actuel - joueur;
+
+        // Si le joueur actuel n’a plus de PM
+        if (joueur_actuel->pm == 0 && joueurs_actifs[index_actuel]) {
+            empiler(&pile_classement_joueurs, joueur_actuel);
+            joueurs_actifs[index_actuel] = 0;
+            nb_joueurs--;
+
+            // Si 1 seul joueur restant alors on empile puis on affiche le classement
+            if (nb_joueurs == 1) {
+                for (int i = 0; i < 4; i++) {
+                    if (joueurs_actifs[i]) {
+                        empiler(&pile_classement_joueurs, &joueur[i]);
+                        joueurs_actifs[i] = 0;
+                        break;
+                    }
+                }
+                classement(&pile_classement_joueurs);
+                return;
+            }
+            //On defile les joueurs puis on réinitialise le temps pour passer au joueur suivant
+            joueur_actuel = defiler(&file);
+            reinit_temps();
+            continue;
+        }
+
+        // Si temps écoulé alors on change de joueur
+        if (temps(buffer)) {
+            if (joueurs_actifs[index_actuel] && joueur_actuel->pm > 0) {
+                enfiler(&file, joueur_actuel);
+            }
+
+            joueur_actuel = defiler(&file);
+            reinit_temps();
+            tour_en_cours++;
+        }
+
+        // Actions pour le déplacement
+        deplacement(buffer, joueur, 4, index_actuel, 0);
+
+        // Affichage des joueurs actifs sur le plateau
+        for (int i = 0; i < 4; i++) {
+            if (!joueurs_actifs[i]) continue;
+            int taille_case = 40;
+            int decalage_x = 20;
+            int decalage_y = (600 - 13 * taille_case) / 2;
+
+            int x = decalage_x + joueur[i].colonne * taille_case + taille_case / 2;
+            int y = decalage_y + joueur[i].ligne * taille_case + taille_case / 2;
+
+            circlefill(buffer, x, y, 20, joueur[i].couleur);
+            if (i == index_actuel) {
+                circle(buffer, x, y, 25, makecol(0, 255, 0));
+            }
+        }
+
+        blit(buffer, screen, 0, 0, 0, 0, 800, 600);
+    }
