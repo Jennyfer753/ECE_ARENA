@@ -1,0 +1,33 @@
+
+#ifndef PARTIES_H
+#define PARTIES_H
+#include <allegro.h>
+#include <stdio.h>
+#include <time.h>
+#include "deplacement.h"
+#include "file.h"
+#include "tours.h"
+#include "temps_jeu.h"
+#include "choix_classe.h"
+#include "joueurs.h"
+#include "classement.h"
+
+
+/*Fontion qui permet de faire le jeu quand il y a 2 joueurs qui jouent.
+ *Parametres: Le buffer crée pour afficher les deux joueurs.
+ */
+void init_1v1(BITMAP* buffer);
+
+
+/*Fontion qui permet de faire le jeu quand il y a 3 joueurs qui jouent.
+ *Parametres: Le buffer crée pour afficher les deux joueurs.
+ */
+void init_1v1v1(BITMAP* buffer);
+
+
+/*Fontion qui permet de faire le jeu quand il y a 4 joueurs qui jouent.
+ *Parametres: Le buffer crée pour afficher les deux joueurs.
+ */
+void init_1v1v1v1(BITMAP* buffer);
+
+#endif //PARTIES_H
