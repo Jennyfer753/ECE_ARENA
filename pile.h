@@ -1,45 +1,49 @@
-#include "pile.h"
-#include <stdlib.h>
-#include <stdio.h>
+#ifndef PILE_H
+#define PILE_H
 
-void init_pile(t_pile*p){
-    p->sommet=NULL;
-    p->taille=0;
-}
 
-char pileVide(t_pile*p){
-    if(p->sommet==NULL) return 1;
-    else return 0;
-}
+///type pour les maillons
+typedef struct maillonP{
+    void *data; //pointeur generique sur la donnee
+    struct maillonP *suivant;  //pointeur sur le maillon suivant
+}t_maillonP;
 
-int tailleP(t_pile*p){
-    return p->taille;
-}
+///type pour la pile
+typedef struct pile{
+    t_maillonP *sommet;//ancre de tete : pointeur sur le sommet de la pile
+    int taille; //taille de la pile
+}t_pile;
 
-void empiler(t_pile*p,void*data){
-    t_maillonP* nouveau;
-    nouveau=malloc(sizeof(t_maillonP));
-    nouveau->data=data;
-    nouveau->suivant=p->sommet;
-    p->sommet=nouveau;
-    (p->taille)++;
-}
+///prototypes des sous-programmes
+/* initialisation d'une pile vide
+parametre : l'adresse de la pile */
+void init_pile(t_pile*p);
 
-void* depiler(t_pile*p){
-    t_maillonP*temp;
-    void* data=NULL;
-    //si liste non vide
-    if(p->sommet!=NULL){
-        temp=p->sommet;
-        p->sommet=p->sommet->suivant;
-        data=temp->data;
-        free(temp);
-        (p->taille)--;
-    }
-    return data;
-}
+/* test si la pile est vide
+parametre : l'adresse de la pile
+retour : 1 si la pile est vide, 0 sinon */
+char pileVide(t_pile*f);
 
-void* sommet(t_pile*p){
-    return p->sommet->data;
-}
+/* compter le nombre d'elements
+parametre : l'adresse de la pile
+retour : taille de la pile */
+int tailleP(t_pile*f);
 
+/* enpiler une nouvelle donnee
+parametres : l'adresse de la pile, l'adresse de la donnee */
+void empiler(t_pile*f,void*data);
+
+/* depiler le prochain element
+parametre : l'adresse de la pile
+retour : l'adresse de la donnee*/
+void* depiler(t_pile*f);
+
+/* acceder au prochain element (donnee en tete)
+parametre : l'adresse de la pile
+retour : adresse de la donnee au sommet de la pile */
+void* sommet(t_pile*f);
+
+
+
+
+#endif //PILE_H
