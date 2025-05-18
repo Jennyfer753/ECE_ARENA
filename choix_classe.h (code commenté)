@@ -1,0 +1,15 @@
+
+#ifndef CHOIX_CLASSE_H
+#define CHOIX_CLASSE_H
+#include "allegro.h"
+#include "joueurs.h"
+#include <stdio.h>
+#include <string.h>  // Pour strcpy
+#include "allegro.h"
+
+/* Fonction qui permet de faire le choix de la classe voulue
+ * Paramètre: le buffer de la page, le joueur actuel qui joue et le numero du joueur
+ */
+void choix_perso(BITMAP* buffer, init_joueurs* j,  int id_joueur);
+
+#endif //CHOIX_CLASSE_H
