@@ -23,6 +23,8 @@ typedef struct {
     Sort sorts[4]; // Chaque personnage a 4 sorts
     char nom_classe[50];
     BITMAP* sprite;
+    int x;
+    int y;
 } ClassePersonnage;
 
 // Prototypes des fonctions
