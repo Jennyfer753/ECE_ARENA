@@ -4,7 +4,7 @@
 
 #ifndef ATTAQUE_CORPS_H
 #define ATTAQUE_CORPS_H
-#include "attaque_sort.h"
+
 
 typedef struct {
     char nom[50];
